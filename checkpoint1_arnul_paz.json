@@ -1,0 +1,241 @@
+{
+  "name": "My workflow actual",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "ea188165-26b5-4308-ba08-1e1c60c69385",
+      "name": "When chat message received",
+      "webhookId": "29e67c93-e6bf-42d0-bd92-fcd475e5f90c"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# ROL\nEres un asistente autónomo de atención al cliente\npara una tienda de productos.\n\n# OBJETIVO\nAyudar al cliente a consultar productos disponibles,\nprecios, categorías, marcas, colores, tallas y stock.\n\n# HERRAMIENTAS\nUtiliza la herramienta \"Consultar Productos\" cuando\nnecesites información del catálogo.\n\nUtiliza Gmail únicamente cuando sea necesario\nescalar la atención a un supervisor.\n\n# REGLAS\n1. No inventes productos.\n2. No inventes precios.\n3. No inventes disponibilidad.\n4. Cuando la información pueda obtenerse del catálogo,\n   consulta Airtable antes de responder.\n5. Responde utilizando exclusivamente información\n   disponible en el catálogo.\n6. Si no encuentras el producto solicitado,\n   indícalo claramente.\n\n# ESCALAMIENTO\nEscala a un supervisor cuando:\n- el cliente solicite atención humana;\n- el problema no pueda resolverse con el catálogo;\n- exista una situación que requiera intervención humana.\n\n# RESTRICCIONES\nNo puedes modificar productos.\nNo puedes modificar precios.\nNo puedes modificar inventario.\nNo puedes inventar información.\nNo puedes ejecutar acciones fuera de las herramientas\nautorizadas.\n\n# FORMATO DE RESPUESTA\nResponde de forma clara, breve y profesional.",
+          "maxIterations": 5
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "35bd10bf-8ad3-42c9-ae70-6cec8a060560",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openrouter/free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        96,
+        224
+      ],
+      "id": "89ffe332-a070-4da5-9691-006c7cf80bb0",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "d8vdqAhyIuOb1UnN",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        496,
+        192
+      ],
+      "id": "921b3bcc-fbb1-47fe-8516-384791cca0b0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Consulta el catálogo de productos de la tienda en Airtable. Úsala cuando el cliente pregunte por productos, precios, disponibilidad, stock, tallas, colores, categorías o características. Devuelve la información disponible del producto y no inventes datos que no estén en el catálogo.",
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appKTlIVwmQ0G4Jkt",
+          "mode": "list",
+          "cachedResultName": "Gestor de Campañas para Tienda de productos",
+          "cachedResultUrl": "https://airtable.com/appKTlIVwmQ0G4Jkt"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblnAmPAlCXDePJPp",
+          "mode": "list",
+          "cachedResultName": "Productos",
+          "cachedResultUrl": "https://airtable.com/appKTlIVwmQ0G4Jkt/tblnAmPAlCXDePJPp"
+        },
+        "filterByFormula": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filter_By_Formula', `Genera una fórmula válida de Airtable para filtrar el catálogo según la solicitud específica del cliente.\n\nUtiliza los campos disponibles:\nProducto, Descripción, Categoría, Marca, ID Producto, Color, Talla, Precio (COP) y Stock.\n\nREGLAS:\n- Si el cliente menciona un producto, filtra por el campo Producto.\n- Si menciona una categoría, filtra por Categoría.\n- Si menciona una marca, filtra por Marca.\n- Si menciona un color, filtra por Color.\n- Si menciona una talla, filtra por Talla.\n- Si menciona un ID de producto, filtra por ID Producto.\n- Si pregunta por productos disponibles, asegúrate de que Stock sea mayor que 0.\n- Si proporciona varios criterios, combina los criterios para que los resultados cumplan con ellos.\n- No devuelvas todos los registros cuando el cliente haya especificado algún criterio.\n- No inventes valores que no estén en la solicitud del cliente.\n- Si el cliente no proporciona ningún criterio concreto, puedes devolver los productos disponibles con Stock mayor que 0.\n- La fórmula debe ser una fórmula válida de Airtable.`, 'string') }}",
+        "returnAll": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtableTool",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        304
+      ],
+      "id": "d8d4385c-2f4b-4646-bbac-61348668fcee",
+      "name": "Consultar Productos",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "MVchKcDnHRFb5ViV",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Escala al supervisor los casos que el agente no pueda resolver, cuando el cliente solicite atención humana o cuando sea necesario realizar una intervención manual. Envía al supervisor un correo con el contexto de la conversación y el motivo de la escalación.",
+        "sendTo": "arpaz886@gmail.com",
+        "subject": "Escalamiento a supervisor — Atención requerida",
+        "message": "=<h2>🚨 Escalamiento a supervisor</h2>  <p><strong>El agente ha solicitado intervención humana.</strong></p>  <p><strong>Mensaje/conversación del cliente:</strong></p>  <p>{{ $json.chatInput }}</p>  <p><strong>Fecha:</strong> {{ $now }}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        848,
+        256
+      ],
+      "id": "0f2b15a0-0089-40e9-827f-f5c669494b9d",
+      "name": "Send a message in Gmail",
+      "webhookId": "91a0f2f6-1afc-4cbe-b55e-df4e6c1f7084",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7vSUkbOLkVHdCGfh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "HNIxbALDQ6KfHZKX",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/HNIxbALDQ6KfHZKX",
+          "cachedResultName": "Log - Observabilidad"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "5287e6a5-e646-4ebd-a99d-810ca8c1aef1",
+      "name": "Call 'Log - Observabilidad'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Productos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Call 'Log - Observabilidad'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4b7ef759-b43c-449c-8568-cbd663e4c75b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd6a5323f7d9c41b0e315441915c5de78c927fee7f8f65d9f65b4d0bc3fe5686"
+  },
+  "nodeGroups": [],
+  "id": "gAAMA99ZPNV1nZbR",
+  "tags": []
+}

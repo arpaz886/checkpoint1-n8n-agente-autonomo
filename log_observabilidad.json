@@ -1,0 +1,295 @@
+{
+  "name": "Log - Observabilidad",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -640,
+        128
+      ],
+      "id": "91576983-bca3-4917-b103-2180a06122b6",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "sendTo": "arpaz886@gmail.com",
+        "subject": "Error en workflow de observabilidad n8n",
+        "message": "=<h2>🚨 Error en workflow de observabilidad n8n</h2>  <p><strong>Workflow:</strong> {{ $json.workflow.name }}</p>  <p><strong>Nodo con error:</strong> {{ $json.execution.lastNodeExecuted }}</p>  <p><strong>Error:</strong></p>  <p>{{ $json.execution.error.message }}</p>  <p><strong>ID de ejecución:</strong> {{ $json.execution.id }}</p>  <p><strong>Inicio:</strong> {{ $json.execution.startedAt }}</p>  <p><strong>Fin:</strong> {{ $json.execution.stoppedAt }}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        240
+      ],
+      "id": "b3edfdc8-bebd-4544-845b-b7810deef09a",
+      "name": "Send a message",
+      "webhookId": "d6197e01-755e-427c-84e7-9d21fe4f6e6e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7vSUkbOLkVHdCGfh",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appKTlIVwmQ0G4Jkt",
+          "mode": "list",
+          "cachedResultName": "Gestor de Campañas para Tienda de productos",
+          "cachedResultUrl": "https://airtable.com/appKTlIVwmQ0G4Jkt"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblPaHFVn4D85nMuN",
+          "mode": "list",
+          "cachedResultName": "Logs",
+          "cachedResultUrl": "https://airtable.com/appKTlIVwmQ0G4Jkt/tblPaHFVn4D85nMuN"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Log Entry": "=Ejecución del agente - {{$now}}",
+            "Fecha y hora": "={{$now}}",
+            "Tipo de Log": "Ejecución de agente",
+            "Usuario": "Agente IA",
+            "Detalles": "={{$json.output}}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "Log Entry",
+              "displayName": "Log Entry",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Tipo de Log",
+              "displayName": "Tipo de Log",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Creación de producto",
+                  "value": "Creación de producto"
+                },
+                {
+                  "name": "Actualización de producto",
+                  "value": "Actualización de producto"
+                },
+                {
+                  "name": "Eliminación de producto",
+                  "value": "Eliminación de producto"
+                },
+                {
+                  "name": "Campaña nueva",
+                  "value": "Campaña nueva"
+                },
+                {
+                  "name": "Publicación nueva",
+                  "value": "Publicación nueva"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                },
+                {
+                  "name": "Automatización",
+                  "value": "Automatización"
+                },
+                {
+                  "name": "Ejecución de agente",
+                  "value": "Ejecución de agente"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha y hora",
+              "displayName": "Fecha y hora",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Usuario",
+              "displayName": "Usuario",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Producto relacionado",
+              "displayName": "Producto relacionado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Campaña relacionada",
+              "displayName": "Campaña relacionada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Publicación relacionada",
+              "displayName": "Publicación relacionada",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Detalles",
+              "displayName": "Detalles",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Adjuntos",
+              "displayName": "Adjuntos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        128
+      ],
+      "id": "006ee500-2a32-4b1f-ad8c-1a8b3cd4a51a",
+      "name": "Registrar Log",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "MVchKcDnHRFb5ViV",
+          "name": "Airtable account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "sendTo": "arpaz886@gmail.com",
+        "subject": "Reporte de ejecución - Agente IA",
+        "message": "=<h3>Reporte de ejecución - Agente IA</h3>  <p><strong>Estado:</strong> Ejecución exitosa</p>  <p><strong>Fecha y hora:</strong> {{$now}}</p>  <p><strong>Usuario:</strong> Agente IA</p>  <p><strong>Resultado del agente:</strong></p>  <p>{{$json.Detalles}}</p>  <p><strong>Workflow:</strong> My workflow actual</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        32
+      ],
+      "id": "4c437a87-36c9-4cc0-8349-11a32bebe197",
+      "name": "Send a message1",
+      "webhookId": "3a5e06f7-6428-4e61-b682-318d8baeb967",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7vSUkbOLkVHdCGfh",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Registrar Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Log": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "48645639-a79b-414a-bdc8-ceb63a58b924",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd6a5323f7d9c41b0e315441915c5de78c927fee7f8f65d9f65b4d0bc3fe5686"
+  },
+  "nodeGroups": [],
+  "id": "HNIxbALDQ6KfHZKX",
+  "tags": []
+}
